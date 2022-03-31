@@ -36,6 +36,7 @@ const Hompage = () => {
         setToDo(dataToDo);
         setSearch(dataToDo);
         setLoadPage(true);
+        document.title = `ToDos`;
       })
       .catch((error) => console.log(error));
   };

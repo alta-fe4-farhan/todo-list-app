@@ -24,6 +24,7 @@ const Completed = () => {
       })
       .then((response) => {
         setToDoList(response.data.items);
+        document.title = `ToDos`;
       })
       .catch((error) => console.log(error));
   };

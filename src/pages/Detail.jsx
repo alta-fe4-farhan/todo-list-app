@@ -33,6 +33,7 @@ const Detail = () => {
       .then((response) => {
         setToDo(response.data);
         setReadyPage(true);
+        document.title = `ToDos Detail`;
       })
       .catch((error) => console.log(error));
   };
