@@ -56,22 +56,30 @@ const Hompage = () => {
       data: data,
     };
 
-    axios(config)
-      .then(() => {
-        getTodo();
-        MySwal.fire({
-          title: "Success",
-          text: "Add new task!",
-          icon: "success",
+    if (titleTask.current.value) {
+      axios(config)
+        .then(() => {
+          getTodo();
+          MySwal.fire({
+            title: "Success",
+            text: "Add new task!",
+            icon: "success",
+          });
+        })
+        .catch(() => {
+          MySwal.fire({
+            title: "Opps!",
+            text: "Can't add new task!",
+            icon: "error",
+          });
         });
-      })
-      .catch(() => {
-        MySwal.fire({
-          title: "Opps!",
-          text: "Can't add new task!",
-          icon: "error",
-        });
+    } else {
+      MySwal.fire({
+        title: "Opps!",
+        text: "Enter your task!",
+        icon: "error",
       });
+    }
 
     titleTask.current.value = "";
   };
