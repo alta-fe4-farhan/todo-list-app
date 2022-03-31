@@ -9,11 +9,14 @@ import "../styles/style.css";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import FirstTask from "../components/FirstTask";
+import TaskNotFound from "../components/TaskNotFound";
 
 const Hompage = () => {
   let titleTask = React.createRef();
   const MySwal = withReactContent(Swal);
-  const [toDoList, setToDo] = useState([]);
+  const [toDo, setToDo] = useState([]);
+  const [toDoList, setSearch] = useState(toDo);
+  const [loadPage, setLoadPage] = useState(false);
 
   useEffect(() => {
     getTodo();
@@ -27,10 +30,12 @@ const Hompage = () => {
         },
       })
       .then((response) => {
-        const toDo = response.data.filter((task) => {
+        const dataToDo = response.data.filter((task) => {
           return task.section_id === 0;
         });
-        setToDo(toDo);
+        setToDo(dataToDo);
+        setSearch(dataToDo);
+        setLoadPage(true);
       })
       .catch((error) => console.log(error));
   };
@@ -51,18 +56,20 @@ const Hompage = () => {
     };
 
     axios(config)
-      .then((response) => {
-        if (response) {
-          MySwal.fire({
-            title: "Success",
-            text: "Add New Task!",
-            icon: "success",
-          });
-          getTodo();
-        }
+      .then(() => {
+        getTodo();
+        MySwal.fire({
+          title: "Success",
+          text: "Add new task!",
+          icon: "success",
+        });
       })
-      .catch((error) => {
-        console.log(error);
+      .catch(() => {
+        MySwal.fire({
+          title: "Opps!",
+          text: "Can't add new task!",
+          icon: "error",
+        });
       });
 
     titleTask.current.value = "";
@@ -85,15 +92,13 @@ const Hompage = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         axios(config)
-          .then((response) => {
-            if (response) {
-              getTodo();
-            }
+          .then(() => {
+            getTodo();
+            MySwal.fire("Deleted!", "", "success");
           })
-          .catch((error) => {
-            console.log(error);
+          .catch(() => {
+            MySwal.fire("Opps!", "", "error");
           });
-        MySwal.fire("Deleted!", "", "success");
       }
     });
   };
@@ -115,17 +120,29 @@ const Hompage = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         axios(config)
-          .then((response) => {
-            if (response) {
-              getTodo();
-            }
+          .then(() => {
+            getTodo();
+            MySwal.fire("Task Completed!", "", "success");
           })
-          .catch((error) => {
-            console.log(error);
+          .catch(() => {
+            MySwal.fire("Opps!", "", "error");
           });
-        MySwal.fire("Task Completed!", "", "success");
       }
     });
+  };
+
+  const escapeRegExp = (value) => {
+    return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+  };
+
+  const searchToDo = (keywordSearch) => {
+    const searchRegex = new RegExp(escapeRegExp(keywordSearch), "i");
+    const filterToDo = toDo.filter((row) => {
+      return Object.keys(row).some((field) => {
+        return searchRegex.test(row[field] ? row[field].toString() : null);
+      });
+    });
+    setSearch(filterToDo);
   };
 
   return (
@@ -146,31 +163,47 @@ const Hompage = () => {
             </div>
           </div>
         </div>
-        <div className="row py-4 justify-content-center">
-          {toDoList.length !== 0 ? (
-            <div className="col-lg-12">
-              <ul className="list-group">
-                {toDoList.map((items) => {
-                  return (
-                    <li className="list-group-item border-0 border-bottom d-flex" key={items.id}>
-                      <Link to={`/detail/${items.id}`} className="text-decoration-none text-dark">
-                        {items.content}
-                      </Link>
-                      <div className="ms-auto">
-                        <button onClick={() => closeToDo(items.id)} className="btn btn-primary btn-sm">
-                          Complete Task
-                        </button>{" "}
-                        <button onClick={() => delToDo(items.id)} className="btn btn-danger btn-sm">
-                          Remove
-                        </button>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
+        <div className="row py-4 justify-content-center gap-3">
+          {toDo.length > 0 ? (
+            <div className="col-lg-12 d-flex justify-content-end">
+              <input type="text" className="form-control border-0 border-bottom" style={{ width: "250px" }} placeholder="Search task...." onChange={(e) => searchToDo(e.target.value)} />
             </div>
           ) : (
-            <FirstTask />
+            ""
+          )}
+
+          {loadPage ? (
+            toDo.length !== 0 ? (
+              toDoList.length !== 0 ? (
+                <div className="col-lg-12">
+                  <ul className="list-group">
+                    {toDoList.map((items) => {
+                      return (
+                        <li className="list-group-item border-0 border-bottom d-flex" key={items.id}>
+                          <Link to={`/detail/${items.id}`} className="text-decoration-none text-dark">
+                            {items.content.length >= 100 ? items.content.substring(0, 100) + "..." : items.content}
+                          </Link>
+                          <div className="ms-auto d-flex flex-wrap gap-2">
+                            <button onClick={() => closeToDo(items.id)} className="btn btn-primary btn-sm">
+                              Mark as Complete
+                            </button>
+                            <button onClick={() => delToDo(items.id)} className="btn btn-danger btn-sm">
+                              Remove
+                            </button>
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              ) : (
+                <TaskNotFound />
+              )
+            ) : (
+              <FirstTask />
+            )
+          ) : (
+            <h2 className="text-center">Loading....</h2>
           )}
         </div>
       </div>

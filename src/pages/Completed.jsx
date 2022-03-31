@@ -45,15 +45,13 @@ const Completed = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         axios(config)
-          .then((response) => {
-            if (response) {
-              getToDoCompleted();
-            }
+          .then(() => {
+            getToDoCompleted();
+            MySwal.fire("Uncompleted Task!", "", "success");
           })
-          .catch((error) => {
-            console.log(error);
+          .catch(() => {
+            MySwal.fire("Opps!", "", "error");
           });
-        MySwal.fire("Uncompleted Task!", "", "success");
       }
     });
   };
@@ -62,7 +60,7 @@ const Completed = () => {
     <Layout>
       <div className="container">
         <div className="row py-4">
-          <h1 className="text-muted text-center">todos completed</h1>
+          <h1 className="text-muted text-center">task completed</h1>
         </div>
         <div className="row justify-content-center">
           <div className="col-lg-12">
@@ -70,7 +68,7 @@ const Completed = () => {
               {toDoList.map((items) => {
                 return (
                   <li className="list-group-item border-0 border-bottom d-flex" key={items.id}>
-                    {items.content}
+                    {items.content.length >= 100 ? items.content.substring(0, 100) + "..." : items.content}
                     <div className="ms-auto">
                       <button className="btn btn-danger btn-sm" onClick={() => uncompleted(items.task_id)}>
                         Uncompleted

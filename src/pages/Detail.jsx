@@ -44,8 +44,6 @@ const Detail = () => {
       description: descriptionTask.current.value,
     });
 
-    // console.log(data);
-
     let config = {
       method: "post",
       url: `https://api.todoist.com/rest/v1/tasks/${id}`,
@@ -58,18 +56,20 @@ const Detail = () => {
     };
 
     axios(config)
-      .then((response) => {
-        if (response) {
-          MySwal.fire({
-            title: "Success",
-            text: "Update Task!",
-            icon: "success",
-          });
-          getTodo();
-        }
+      .then(() => {
+        getTodo();
+        MySwal.fire({
+          title: "Success",
+          text: "Update Task!",
+          icon: "success",
+        });
       })
-      .catch((error) => {
-        console.log(error);
+      .catch(() => {
+        MySwal.fire({
+          title: "Opps!",
+          text: "Try Again!",
+          icon: "error",
+        });
       });
   };
 
