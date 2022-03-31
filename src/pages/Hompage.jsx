@@ -5,10 +5,10 @@ import axios from "axios";
 import Layout from "../components/Layout";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.min.js";
-import "bootstrap/js/dist/toast.js";
 import "../styles/style.css";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import FirstTask from "../components/FirstTask";
 
 const Hompage = () => {
   let titleTask = React.createRef();
@@ -34,8 +34,6 @@ const Hompage = () => {
       })
       .catch((error) => console.log(error));
   };
-
-  // console.log(toDoList);
 
   const addToDo = () => {
     let data = JSON.stringify({
@@ -101,7 +99,6 @@ const Hompage = () => {
   };
 
   const closeToDo = (id) => {
-    // console.log(id);
     let config = {
       method: "post",
       url: `https://api.todoist.com/rest/v1/tasks/${id}/close`,
@@ -150,27 +147,31 @@ const Hompage = () => {
           </div>
         </div>
         <div className="row py-4 justify-content-center">
-          <div className="col-lg-12">
-            <ul className="list-group">
-              {toDoList.map((items) => {
-                return (
-                  <li className="list-group-item border-0 border-bottom d-flex" key={items.id}>
-                    <Link to={`/detail/${items.id}`} className="text-decoration-none text-dark">
-                      {items.content}
-                    </Link>
-                    <div className="ms-auto">
-                      <button onClick={() => closeToDo(items.id)} className="btn btn-primary btn-sm">
-                        Complete Task
-                      </button>{" "}
-                      <button onClick={() => delToDo(items.id)} className="btn btn-danger btn-sm">
-                        Remove
-                      </button>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
+          {toDoList.length !== 0 ? (
+            <div className="col-lg-12">
+              <ul className="list-group">
+                {toDoList.map((items) => {
+                  return (
+                    <li className="list-group-item border-0 border-bottom d-flex" key={items.id}>
+                      <Link to={`/detail/${items.id}`} className="text-decoration-none text-dark">
+                        {items.content}
+                      </Link>
+                      <div className="ms-auto">
+                        <button onClick={() => closeToDo(items.id)} className="btn btn-primary btn-sm">
+                          Complete Task
+                        </button>{" "}
+                        <button onClick={() => delToDo(items.id)} className="btn btn-danger btn-sm">
+                          Remove
+                        </button>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ) : (
+            <FirstTask />
+          )}
         </div>
       </div>
     </Layout>

@@ -4,7 +4,6 @@ import axios from "axios";
 import Layout from "../components/Layout";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.min.js";
-import "bootstrap/js/dist/toast.js";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 
